@@ -96,6 +96,7 @@ GameEngine = Class.extend({
 
         // Toggle sound
         gInputEngine.addListener('mute', this.toggleSound);
+        gInputEngine.addListener('debugger', () => {debugger});
 
         // Restart listener
         // Timeout because when you press enter in address bar too long, it would not show menu

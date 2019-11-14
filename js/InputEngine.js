@@ -33,6 +33,7 @@ InputEngine = Class.extend({
         this.bind(13, 'restart');
         this.bind(27, 'escape');
         this.bind(77, 'mute');
+        this.bind(191, 'debugger');
 
         document.addEventListener('keydown', this.onKeyDown);
         document.addEventListener('keyup', this.onKeyUp);
