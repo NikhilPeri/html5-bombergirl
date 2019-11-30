@@ -1,7 +1,5 @@
-Entity = Class.extend({
-    init: function() {
-    },
+class Entity {
+    constructor() {};
 
-    update: function() {
-    }
-});
+    update() {};
+}

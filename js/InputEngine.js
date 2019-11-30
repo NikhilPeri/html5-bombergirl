@@ -1,22 +1,21 @@
-InputEngine = Class.extend({
+class InputEngine {
     /**
      * A dictionary mapping ASCII key codes to string values describing
      * the action we want to take when that key is pressed.
      */
-    bindings: {},
+    bindings = {};
 
     /**
      * A dictionary mapping actions that might be taken in our game
      * to a boolean value indicating whether that action is currently being performed.
      */
-    actions: {},
+    actions = {};
 
-    listeners: [],
+    listeners = [];
 
-    init: function() {
-    },
+    constructor() {};
 
-    setup: function() {
+    setup() {
         this.bind(38, 'up');
         this.bind(37, 'left');
         this.bind(40, 'down');
@@ -37,18 +36,18 @@ InputEngine = Class.extend({
 
         document.addEventListener('keydown', this.onKeyDown);
         document.addEventListener('keyup', this.onKeyUp);
-    },
+    }
 
-    onKeyDown: function(event) {
+    onKeyDown(event) {
         var action = gInputEngine.bindings[event.keyCode];
         if (action) {
             gInputEngine.actions[action] = true;
             event.preventDefault();
         }
         return false;
-    },
+    }
 
-    onKeyUp: function(event) {
+    onKeyUp(event) {
         var action = gInputEngine.bindings[event.keyCode];
         if (action) {
             gInputEngine.actions[action] = false;
@@ -63,24 +62,24 @@ InputEngine = Class.extend({
             event.preventDefault();
         }
         return false;
-    },
+    }
 
     /**
      * The bind function takes an ASCII keycode and a string representing
      * the action to take when that key is pressed.
      */
-    bind: function(key, action) {
+    bind(key, action) {
         this.bindings[key] = action;
-    },
+    }
 
-    addListener: function(action, listener) {
+    addListener(action, listener) {
         this.listeners[action] = this.listeners[action] || new Array();
         this.listeners[action].push(listener);
-    },
+    }
 
-    removeAllListeners: function() {
+    removeAllListeners() {
         this.listeners = [];
     }
-});
+}
 
 gInputEngine = new InputEngine();

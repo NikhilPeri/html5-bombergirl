@@ -1,28 +1,18 @@
-Fire = Entity.extend({
-    /**
-     * Entity position on map grid
-     */
-    position: {},
+class Fire extends Entity {
+    // Entity position on map grid
+    position = {};
 
-    /**
-     * Bitmap dimensions
-     */
-    size: {
-        w: 38,
-        h: 38
-    },
+    // Bitmap dimensions
+    size = { w: 38, h: 38}
 
-    /**
-     * Bitmap animation
-     */
-    bmp: null,
+    // Bitmap animation
+    bmp = null;
 
-    /**
-     * The bomb that triggered this fire
-     */
-    bomb: null,
+    // The bomb that triggered this fire
+    bomb = null;
 
-    init: function(position, bomb) {
+    constructor(position, bomb) {
+        super();
         this.bomb = bomb;
 
         var spriteSheet = new createjs.SpriteSheet({
@@ -46,12 +36,11 @@ Fire = Entity.extend({
         this.bmp.y = pixels.y - 5;
 
         gGameEngine.stage.addChild(this.bmp);
-    },
+    }
 
-    update: function() {
-    },
+    update() { }
 
-    remove: function() {
+    remove() {
         if (this.bomb.explodeListener) {
             this.bomb.explodeListener();
             this.bomb.explodeListener = null;
@@ -73,4 +62,4 @@ Fire = Entity.extend({
             }
         }
     }
-});
+}

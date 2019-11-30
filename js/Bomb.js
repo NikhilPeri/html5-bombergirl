@@ -1,44 +1,30 @@
-Bomb = Entity.extend({
-    /**
-     * Entity position on map grid
-     */
-    position: {},
+class Bomb extends Entity {
+    // Entity position on map grid
+    position = {};
 
-    /**
-     * How far the fire reaches when bomb explodes
-     */
-    strength: 1,
+    // How far the fire reaches when bomb explodes
+    strength = 1;
 
-    /**
-     * Bitmap dimensions
-     */
-    size: {
-        w: 28,
-        h: 28
-    },
+    // Bitmap dimensions
+    size = { w: 28, h: 28 };
 
-    /**
-     * Bitmap animation
-     */
-    bmp: null,
+    // Bitmap animation
+    bmp = null;
 
-    /**
-     * Timer in frames
-     */
-    timer: 0,
+    // Timer in frames
+    timer = 0;
 
-    /**
-     * Max timer value in seconds
-     */
-    timerMax: 2,
+    // Max timer value in seconds
+    timerMax = 2;
 
-    exploded: false,
+    exploded = false;
 
-    fires: [],
+    fires = [];
 
-    explodeListener: null,
+    explodeListener = null;
 
-    init: function(position, strength) {
+    constructor(position, strength) {
+        super();
         this.strength = strength;
 
         var spriteSheet = new createjs.SpriteSheet({
@@ -72,18 +58,18 @@ Bomb = Entity.extend({
                 player.escapeBomb = this;
             }
         }
-    },
+    }
 
-    update: function() {
+    update() {
         if (this.exploded) { return; }
 
         this.timer++;
         if (this.timer > this.timerMax * createjs.Ticker.getMeasuredFPS()) {
             this.explode();
         }
-    },
+    }
 
-    explode: function() {
+    explode() {
         this.exploded = true;
 
         if (!gGameEngine.mute && gGameEngine.soundtrackPlaying) {
@@ -114,12 +100,10 @@ Bomb = Entity.extend({
         }
 
         this.remove();
-    },
+    }
 
-    /**
-     * Returns positions that are going to be covered by fire.
-     */
-    getDangerPositions: function() {
+    // Returns positions that are going to be covered by fire.
+    getDangerPositions() {
         var positions = [];
         positions.push(this.position);
 
@@ -158,18 +142,18 @@ Bomb = Entity.extend({
         }
 
         return positions;
-    },
+    }
 
-    fire: function(position) {
+    fire(position) {
         var fire = new Fire(position, this);
         this.fires.push(fire);
-    },
+    }
 
-    remove: function() {
+    remove() {
         gGameEngine.stage.removeChild(this.bmp);
-    },
+    }
 
-    setExplodeListener: function(listener) {
+    setExplodeListener(listener) {
         this.explodeListener = listener;
     }
-});
+}

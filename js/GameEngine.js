@@ -1,43 +1,43 @@
-GameEngine = Class.extend({
-    tileSize: 32,
-    tilesX: 17,
-    tilesY: 13,
-    size: {},
-    fps: 50,
-    botsCount: 2, /* 0 - 3 */
-    playersCount: 2, /* 1 - 2 */
-    bonusesPercent: 16,
+class GameEngine {
+    tileSize = 32;
+    tilesX = 17;
+    tilesY = 13;
+    size =  {};
+    fps = 50;
+    botsCount = 2; /* 0 - 3 */
+    playersCount = 2; /* 1 - 2 */
+    bonusesPercent = 16;
 
-    stage: null,
-    menu: null,
-    players: [],
-    bots: [],
-    tiles: [],
-    bombs: [],
-    bonuses: [],
+    stage = null;
+    menu = null;
+    players = [];
+    bots = [];
+    tiles = [];
+    bombs = [];
+    bonuses = [];
 
-    playerBoyImg: null,
-    playerGirlImg: null,
-    playerGirl2Img: null,
-    tilesImgs: {},
-    bombImg: null,
-    fireImg: null,
-    bonusesImg: null,
+    playerBoyImg = null;
+    playerGirlImg = null;
+    playerGirl2Img = null;
+    tilesImgs = {};
+    bombImg = null;
+    fireImg = null;
+    bonusesImg = null;
 
-    playing: false,
-    mute: false,
-    soundtrackLoaded: false,
-    soundtrackPlaying: false,
-    soundtrack: null,
+    playing = false;
+    mute = false;
+    soundtrackLoaded = false;
+    soundtrackPlaying = false;
+    soundtrack = null;
 
-    init: function() {
+    constructor() {
         this.size = {
             w: this.tileSize * this.tilesX,
             h: this.tileSize * this.tilesY
         };
-    },
+    }
 
-    load: function() {
+    load() {
         // Init canvas
         this.stage = new createjs.Stage("canvas");
         this.stage.enableMouseOver();
@@ -76,9 +76,9 @@ GameEngine = Class.extend({
 
         // Create menu
         this.menu = new Menu();
-    },
+    }
 
-    setup: function() {
+    setup() {
         if (!gInputEngine.bindings.length) {
             gInputEngine.setup();
         }
@@ -133,26 +133,26 @@ GameEngine = Class.extend({
         if (!this.playing) {
             this.menu.show();
         }
-    },
+    }
 
-    onSoundLoaded: function(sound) {
+    onSoundLoaded(sound) {
         if (sound.id == 'game') {
             gGameEngine.soundtrackLoaded = true;
             if (gGameEngine.playersCount > 0) {
                 gGameEngine.playSoundtrack();
             }
         }
-    },
+    }
 
-    playSoundtrack: function() {
+    playSoundtrack() {
         if (!gGameEngine.soundtrackPlaying) {
             gGameEngine.soundtrack = createjs.Sound.play("game", "none", 0, 0, -1);
             gGameEngine.soundtrack.setVolume(1);
             gGameEngine.soundtrackPlaying = true;
         }
-    },
+    }
 
-    update: function() {
+    update() {
         // Player
         for (var i = 0; i < gGameEngine.players.length; i++) {
             var player = gGameEngine.players[i];
@@ -176,9 +176,9 @@ GameEngine = Class.extend({
 
         // Stage
         gGameEngine.stage.update();
-    },
+    }
 
-    drawTiles: function() {
+    drawTiles() {
         for (var i = 0; i < this.tilesY; i++) {
             for (var j = 0; j < this.tilesX; j++) {
                 if ((i == 0 || j == 0 || i == this.tilesY - 1 || j == this.tilesX - 1)
@@ -205,9 +205,9 @@ GameEngine = Class.extend({
                 }
             }
         }
-    },
+    }
 
-    drawBonuses: function() {
+    drawBonuses() {
         // Cache woods tiles
         var woods = [];
         for (var i = 0; i < this.tiles.length; i++) {
@@ -248,9 +248,9 @@ GameEngine = Class.extend({
                 }
             }
         }
-    },
+    }
 
-    spawnBots: function() {
+    spawnBots() {
         this.bots = [];
 
         if (this.botsCount >= 1) {
@@ -272,9 +272,9 @@ GameEngine = Class.extend({
             var bot = new Bot({ x: 1, y: 1 });
             this.bots.push(bot);
         }
-    },
+    }
 
-    spawnPlayers: function() {
+    spawnPlayers() {
         this.players = [];
 
         if (this.playersCount >= 1) {
@@ -293,36 +293,30 @@ GameEngine = Class.extend({
             var player2 = new Player({ x: this.tilesX - 2, y: this.tilesY - 2 }, controls, 1);
             this.players.push(player2);
         }
-    },
+    }
 
-    /**
-     * Checks whether two rectangles intersect.
-     */
-    intersectRect: function(a, b) {
+    // Checks whether two rectangles intersect.
+    intersectRect(a, b) {
         return (a.left <= b.right && b.left <= a.right && a.top <= b.bottom && b.top <= a.bottom);
-    },
+    }
 
-    /**
-     * Returns tile at given position.
-     */
-    getTile: function(position) {
+    // Returns tile at given position.
+    getTile(position) {
         for (var i = 0; i < this.tiles.length; i++) {
             var tile = this.tiles[i];
             if (tile.position.x == position.x && tile.position.y == position.y) {
                 return tile;
             }
         }
-    },
+    }
 
-    /**
-     * Returns tile material at given position.
-     */
-    getTileMaterial: function(position) {
+    // Returns tile material at given position.
+    getTileMaterial(position) {
         var tile = this.getTile(position);
         return (tile) ? tile.material : 'grass' ;
-    },
+    }
 
-    gameOver: function(status) {
+    gameOver(status) {
         if (gGameEngine.menu.visible) { return; }
 
         if (status == 'win') {
@@ -335,32 +329,30 @@ GameEngine = Class.extend({
         } else {
             this.menu.show([{text: 'Game Over', color: '#CC0000'}, {text: ' :(', color: '#FF4444'}]);
         }
-    },
+    }
 
-    getWinner: function() {
+    getWinner() {
         for (var i = 0; i < gGameEngine.players.length; i++) {
             var player = gGameEngine.players[i];
             if (player.alive) {
                 return i;
             }
         }
-    },
+    }
 
-    restart: function() {
+    restart() {
         gInputEngine.removeAllListeners();
         gGameEngine.stage.removeAllChildren();
         gGameEngine.setup();
-    },
+    }
 
-    /**
-     * Moves specified child to the front.
-     */
-    moveToFront: function(child) {
+    // Moves specified child to the front.
+    moveToFront(child) {
         var children = gGameEngine.stage.getNumChildren();
         gGameEngine.stage.setChildIndex(child, children - 1);
-    },
+    }
 
-    toggleSound: function() {
+    toggleSound() {
         if (gGameEngine.mute) {
             gGameEngine.mute = false;
             gGameEngine.soundtrack.resume();
@@ -368,9 +360,9 @@ GameEngine = Class.extend({
             gGameEngine.mute = true;
             gGameEngine.soundtrack.pause();
         }
-    },
+    }
 
-    countPlayersAlive: function() {
+    countPlayersAlive() {
         var playersAlive = 0;
         for (var i = 0; i < gGameEngine.players.length; i++) {
             if (gGameEngine.players[i].alive) {
@@ -378,9 +370,9 @@ GameEngine = Class.extend({
             }
         }
         return playersAlive;
-    },
+    }
 
-    getPlayersAndBots: function() {
+    getPlayersAndBots() {
         var players = [];
 
         for (var i = 0; i < gGameEngine.players.length; i++) {
@@ -393,6 +385,6 @@ GameEngine = Class.extend({
 
         return players;
     }
-});
+}
 
 gGameEngine = new GameEngine();
