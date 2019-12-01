@@ -13,21 +13,33 @@ class InputEngine {
 
     listeners = [];
 
-    constructor() {};
+    constructor() { };
 
     setup() {
-        this.bind(38, 'up');
-        this.bind(37, 'left');
-        this.bind(40, 'down');
-        this.bind(39, 'right');
-        this.bind(32, 'bomb');
-        this.bind(18, 'bomb');
+        this.bind(38, 'up0');    // up arrow
+        this.bind(37, 'left0');  // left arrow
+        this.bind(40, 'down0');  // down arrow
+        this.bind(39, 'right0'); // right arrow
+        this.bind(32, 'bomb0');  // space
+        this.bind(18, 'bomb0');  // alt right
 
-        this.bind(87, 'up2');
-        this.bind(65, 'left2');
-        this.bind(83, 'down2');
-        this.bind(68, 'right2');
-        this.bind(16, 'bomb2');
+        this.bind(87, 'up1');    // w
+        this.bind(65, 'left1');  // a
+        this.bind(83, 'down1');  // s
+        this.bind(68, 'right1'); // d
+        this.bind(16, 'bomb1');  // shift left
+
+        this.bind(73, 'up2');    // i
+        this.bind(74, 'left2');  // j
+        this.bind(75, 'down2');  // j
+        this.bind(76, 'right2'); // l
+        this.bind(220, 'bomb2'); // \
+
+        this.bind(84, 'up3');    // t
+        this.bind(70, 'left3');  // f
+        this.bind(71, 'down3');  // g
+        this.bind(68, 'right3'); // h
+        this.bind(72, 'bomb3');  // alt left
 
         this.bind(13, 'restart');
         this.bind(27, 'escape');

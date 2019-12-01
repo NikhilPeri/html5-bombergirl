@@ -25,8 +25,8 @@ class Bot extends Player {
     startTimer = 0;
     started = false;
 
-    constructor(position) {
-        super(position);
+    constructor(id, position) {
+        super(id, position);
         this.findTargetPosition();
         this.startTimerMax = Math.random() * 60;
     }

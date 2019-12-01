@@ -4,7 +4,6 @@ class GameEngine {
     tilesY = 13;
     size =  {};
     fps = 50;
-    botsCount = 2; /* 0 - 3 */
     playersCount = 2; /* 1 - 2 */
     bonusesPercent = 16;
 
@@ -36,6 +35,13 @@ class GameEngine {
             w: this.tileSize * this.tilesX,
             h: this.tileSize * this.tilesY
         };
+
+        this.startingPlayerPositions = [
+            {x: 1, y: 1},
+            {x: 1, y: this.tilesY - 2},
+            {x: this.tilesX - 2, y: 1},
+            {x: this.tilesX - 2, y: this.tilesY - 2}
+        ]
     }
 
     load() {
@@ -92,8 +98,8 @@ class GameEngine {
         this.drawTiles();
         this.drawBonuses();
 
-        this.spawnBots();
         this.spawnPlayers();
+        this.spawnBots();
 
         // Toggle sound
         gInputEngine.addListener('mute', this.toggleSound);
@@ -251,48 +257,26 @@ class GameEngine {
         }
     }
 
-    spawnBots() {
-        this.bots = [];
-
-        if (this.botsCount >= 1) {
-            var bot2 = new Bot({ x: 1, y: this.tilesY - 2 });
-            this.bots.push(bot2);
-        }
-
-        if (this.botsCount >= 2) {
-            var bot3 = new Bot({ x: this.tilesX - 2, y: 1 });
-            this.bots.push(bot3);
-        }
-
-        if (this.botsCount >= 3) {
-            var bot = new Bot({ x: this.tilesX - 2, y: this.tilesY - 2 });
-            this.bots.push(bot);
-        }
-
-        if (this.botsCount >= 4) {
-            var bot = new Bot({ x: 1, y: 1 });
-            this.bots.push(bot);
-        }
-    }
-
     spawnPlayers() {
         this.players = [];
-
-        if (this.playersCount >= 1) {
-            var player = new Player({ x: 1, y: 1 });
+        for (var i = 0; i < this.playersCount; i++) {
+            var player = new Player(i, this.startingPlayerPositions[i], {
+                'up':    `up${i}`,
+                'left':  `left${i}`,
+                'down':  `down${i}`,
+                'right': `right${i}`,
+                'bomb':  `bomb${i}`
+            });
             this.players.push(player);
         }
 
-        if (this.playersCount >= 2) {
-            var controls = {
-                'up': 'up2',
-                'left': 'left2',
-                'down': 'down2',
-                'right': 'right2',
-                'bomb': 'bomb2'
-            };
-            var player2 = new Player({ x: this.tilesX - 2, y: this.tilesY - 2 }, controls, 1);
-            this.players.push(player2);
+    }
+
+    spawnBots() {
+        this.bots = [];
+        for (var i = this.playersCount; i < 4; i++) {
+            var bot = new Bot(i, this.startingPlayerPositions[i]);
+            this.bots.push(bot);
         }
     }
 

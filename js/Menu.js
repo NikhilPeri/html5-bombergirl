@@ -4,7 +4,6 @@ class Menu {
     views = [];
 
     constructor() {
-        gGameEngine.botsCount = 4;
         gGameEngine.playersCount = 0;
 
         this.showLoader();
@@ -47,10 +46,10 @@ class Menu {
         this.hide();
 
         if (mode == 'single') {
-            gGameEngine.botsCount = 3;
             gGameEngine.playersCount = 1;
+        } else if (mode == 'training') {
+            gGameEngine.playersCount = 4;
         } else {
-            gGameEngine.botsCount = 2;
             gGameEngine.playersCount = 2;
         }
 

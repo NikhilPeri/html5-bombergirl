@@ -36,7 +36,7 @@ class Player extends Entity {
 
     deadTimer = 0;
 
-    constructor(position, controls, id) {
+    constructor(id, position, controls) {
         super();
         if (id) {
             this.id = id;
