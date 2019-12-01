@@ -24,13 +24,12 @@ class GameEngine {
     bonusesImg = null;
 
     playing = false;
-    headless = false;
     mute = false;
     soundtrackLoaded = false;
     soundtrackPlaying = false;
     soundtrack = null;
 
-    constructor(headless) {
+    constructor() {
         this.size = {
             w: this.tileSize * this.tilesX,
             h: this.tileSize * this.tilesY
@@ -372,120 +371,44 @@ class GameEngine {
     }
 
     // Hack OpenAI Gym integration
-    _reset() {
-        console.log('reset')
-        this.bombs = [];
-        this.tiles = [];
-        this.bonuses = [];
-
-        // Draw tiles
-        for (var i = 0; i < this.tilesY; i++) {
-            for (var j = 0; j < this.tilesX; j++) {
-                if ((i == 0 || j == 0 || i == this.tilesY - 1 || j == this.tilesX - 1)
-                    || (j % 2 == 0 && i % 2 == 0)) {
-                    // Wall tiles
-                    var tile = new Tile('wall', { x: j, y: i });
-                    this.tiles.push(tile);
-                } else {
-                    // Grass tiles
-                    var tile = new Tile('grass', { x: j, y: i });
-                    // Wood tiles
-                    if (!(i <= 2 && j <= 2)
-                        && !(i >= this.tilesY - 3 && j >= this.tilesX - 3)
-                        && !(i <= 2 && j >= this.tilesX - 3)
-                        && !(i >= this.tilesY - 3 && j <= 2)) {
-
-                        var wood = new Tile('wood', { x: j, y: i });
-                        this.tiles.push(wood);
-                    }
-                }
-            }
-        }
-
-        // Cache woods tiles
-        var woods = [];
-        for (var i = 0; i < this.tiles.length; i++) {
-            var tile = this.tiles[i];
-            if (tile.material == 'wood') {
-                woods.push(tile);
-            }
-        }
-
-        // Sort tiles randomly
-        woods.sort(function() {
-            return 0.5 - Math.random();
-        });
-
-        // Distribute bonuses to quarters of map precisely fairly
-        for (var j = 0; j < 4; j++) {
-            var bonusesCount = Math.round(woods.length * this.bonusesPercent * 0.01 / 4);
-            var placedCount = 0;
-            for (var i = 0; i < woods.length; i++) {
-                if (placedCount > bonusesCount) {
-                    break;
-                }
-
-                var tile = woods[i];
-                if ((j == 0 && tile.position.x < this.tilesX / 2 && tile.position.y < this.tilesY / 2)
-                    || (j == 1 && tile.position.x < this.tilesX / 2 && tile.position.y > this.tilesY / 2)
-                    || (j == 2 && tile.position.x > this.tilesX / 2 && tile.position.y < this.tilesX / 2)
-                    || (j == 3 && tile.position.x > this.tilesX / 2 && tile.position.y > this.tilesX / 2)) {
-
-                    var typePosition = placedCount % 3;
-                    var bonus = new Bonus(tile.position, typePosition);
-                    this.bonuses.push(bonus);
-
-                    // Move wood to front
-                    this.moveToFront(tile.bmp);
-
-                    placedCount++;
-                }
-            }
-        }
-
-        var startingPlayerPositions = [
-            {x: 2, y: 2},
-            {x: 2, y: this.tilesY - 2},
-            {x: this.tilesX - 2, y: 2},
-            {x: this.tilesX - 2, y: this.tilesY - 2},
-        ]
-        for (var i = 0; i < startingPlayerPositions.length; i++) {
-            var player = new Player(startingPlayerPositions[i], {
-                'up':    `up${i}`,
-                'left':  `left${i}`,
-                'down':  `down${i}`,
-                'right': `right${i}`,
-                'bomb':  `bomb${i}`
-            }, i);
-            this.players.push(player);
-        }
-        console.log(this.players)
-    }
-
     _observation() {
-        return {'board': [], 'players': []}
-    }
+        // board for observation
+        var board = [];
+        for (var i = 0; i < this.tilesX; i++) {
+            board[i] = [];
+        }
+        // Tiles
+        for (var i = 0; i < gGameEngine.tiles.length; i++) {
+            var tile = gGameEngine.tiles[i];
+            board[tile.position.x][tile.position.y] = tile.material;
+        }
 
-    _step(actions) {
-        debugger;
-        for (var i = 0; i < actions.length; i++) {
-            gInputEngine.actions[actions[i]] = true;
-        }
-        for (var i = 0; i < gGameEngine.players.length; i++) {
-            var player = gGameEngine.players[i];
-            player.update();
-        }
+        // Bombs
         for (var i = 0; i < gGameEngine.bombs.length; i++) {
             var bomb = gGameEngine.bombs[i];
-            bomb.update();
+            board[tile.position.x][tile.position.y] = 'bomb';
         }
-        for (var i = 0; i < actions.length; i++) {
-            gInputEngine.actions[actions[i]] = false;
+
+        for (var i = 0; i < gGameEngine.players.length; i++) {
+            var player = gGameEngine.players[i];
+            board[player.position.x][player.position.y] = `player${player.id}`;
         }
-        return gGameEngine._observation()
+
+        // Bots
+        for (var i = 0; i < gGameEngine.bots.length; i++) {
+            var bot = gGameEngine.bots[i];
+            board[bot.position.x][bot.position.y] = `player${bot.id}`;
+        }
+
+        // Bonuses
+        for (var i = 0; i < gGameEngine.bonuses.length; i++) {
+            var bonus = gGameEngine.bonuses[i];
+            if (board[bonus.position.x][bonus.position.y] != 'wood') {
+                bonus.type
+            }
+        }
+        return board;
     }
 }
 
 gGameEngine = new GameEngine();
-
-module.exports = gGameEngine;
