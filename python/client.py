@@ -1,16 +1,22 @@
 import numpy as np
 
-from python.agents import RandomAgent
+from python.agents import RandomAgent, PolicyAgent
 from python.gym_bomberbot.env import BomberbotEnv
 
 if __name__ == '__main__':
+    agent = PolicyAgent()
+    env = BomberbotEnv()
     try:
-        agent = RandomAgent()
-        env = BomberbotEnv()
         env.reset()
+        observation, done = env.observation(), False
+        while not done:
+            actions = agent.choose_action(observation)
+            import pdb; pdb.set_trace()
+            next_observation, reward, done = env.step(actions)
 
-        for i in range(1000):
-            env.step([agent.act() for i in range(4)])
+            agent.store_transition(observation, actions, reward)
+            observation = next_observation
+        agent.learn()
     except Exception as e:
         print(e)
     finally:
