@@ -72,7 +72,7 @@ class BomberbotEnv(gym.Env):
     ])
 
     reward = player_share + preservation + bomb_gain - bomb_loss
-    done = not observation.any() in range(4)
+    done = observation.min() > 3
 
     return np.clip(observation, 0, 10), reward, done
 

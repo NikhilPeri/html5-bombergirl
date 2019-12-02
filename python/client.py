@@ -11,11 +11,11 @@ if __name__ == '__main__':
         observation, done = env.observation(), False
         while not done:
             actions = agent.choose_action(observation)
-            import pdb; pdb.set_trace()
             next_observation, reward, done = env.step(actions)
 
             agent.store_transition(observation, actions, reward)
             observation = next_observation
+
         agent.learn()
     except Exception as e:
         print(e)

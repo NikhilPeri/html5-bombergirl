@@ -326,6 +326,18 @@ class Player extends Entity {
     die() {
         this.alive = false;
         gInputEngine.removeListener(this.controls.bomb);
+        var players = [];
+        for (var i = 0; i < gGameEngine.players.length; i++) {
+            players.push(gGameEngine.players[i]);
+        }
+
+        for (var i = 0; i < players.length; i++) {
+            var players = players[i];
+            // Remove players
+            if (players == this) {
+                gGameEngine.players.splice(i, 1);
+            }
+        }
         if (gGameEngine.countPlayersAlive() == 1 && gGameEngine.playersCount == 2) {
             gGameEngine.gameOver('win');
         } else if (gGameEngine.countPlayersAlive() == 0) {

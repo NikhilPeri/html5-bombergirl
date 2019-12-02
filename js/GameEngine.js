@@ -377,6 +377,9 @@ class GameEngine {
         for (var i = 0; i < gGameEngine.tilesY; i++) {
             board[i] = Array(gGameEngine.tilesX).fill(9);
         }
+        if (gGameEngine.countPlayersAlive() == 0) {
+            return board
+        }
 
         // Players
         for (var i = 0; i < gGameEngine.players.length; i++) {
