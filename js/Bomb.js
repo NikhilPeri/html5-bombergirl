@@ -128,7 +128,7 @@ class Bomb extends Entity {
                     last = true;
                 } else if (material == 'wood') {
                     explode = true;
-                    last = true;
+                    last = false;
                 }
 
                 if (explode) {

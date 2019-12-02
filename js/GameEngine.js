@@ -5,7 +5,7 @@ class GameEngine {
     size =  {};
     fps = 50;
     playersCount = 2; /* 1 - 2 */
-    bonusesPercent = 16;
+    bonusesPercent = 5;
 
     stage = null;
     menu = null;
@@ -374,39 +374,48 @@ class GameEngine {
     _observation() {
         // board for observation
         var board = [];
-        for (var i = 0; i < this.tilesX; i++) {
-            board[i] = [];
-        }
-        // Tiles
-        for (var i = 0; i < gGameEngine.tiles.length; i++) {
-            var tile = gGameEngine.tiles[i];
-            board[tile.position.x][tile.position.y] = tile.material;
+        for (var i = 0; i < gGameEngine.tilesY; i++) {
+            board[i] = Array(gGameEngine.tilesX).fill(9);
         }
 
-        // Bombs
-        for (var i = 0; i < gGameEngine.bombs.length; i++) {
-            var bomb = gGameEngine.bombs[i];
-            board[tile.position.x][tile.position.y] = 'bomb';
-        }
-
+        // Players
         for (var i = 0; i < gGameEngine.players.length; i++) {
             var player = gGameEngine.players[i];
-            board[player.position.x][player.position.y] = `player${player.id}`;
+            board[player.position.y][player.position.x] = player.id;
+            player.bombs.map((b) => {board[b.position.y][b.position.x] = 10 + player.id;})
         }
 
         // Bots
         for (var i = 0; i < gGameEngine.bots.length; i++) {
             var bot = gGameEngine.bots[i];
-            board[bot.position.x][bot.position.y] = `player${bot.id}`;
+            board[bot.position.y][bot.position.x] = bot.id;
+            bot.bombs.map((b) => {board[b.position.y][b.position.x] = 10 + bot.id;})
+        }
+
+        // Tiles
+        for (var i = 0; i < gGameEngine.tiles.length; i++) {
+            var tile = gGameEngine.tiles[i];
+            if ( tile.material == 'wall') {
+                board[tile.position.y][tile.position.x] = 4
+            } else if ( tile.material == 'wood') {
+                board[tile.position.y][tile.position.x] = 5
+            }
         }
 
         // Bonuses
         for (var i = 0; i < gGameEngine.bonuses.length; i++) {
             var bonus = gGameEngine.bonuses[i];
-            if (board[bonus.position.x][bonus.position.y] != 'wood') {
-                bonus.type
+            if (!board[bonus.position.y][bonus.position.x]) { //grass
+                if ( bonus.type == 'speed') {
+                    board[bonus.position.y][bonus.position.x] = 6
+                } else if ( bonus.type == 'bomb') {
+                    board[bonus.position.y][bonus.position.x] = 7
+                } else {
+                    board[bonus.position.y][bonus.position.x] = 8
+                }
             }
         }
+
         return board;
     }
 }

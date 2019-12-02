@@ -59,6 +59,13 @@ class InputEngine {
         return false;
     }
 
+    actionDown(action) {
+        if (action) {
+            gInputEngine.actions[action] = true;
+        }
+        return false;
+    }
+
     onKeyUp(event) {
         var action = gInputEngine.bindings[event.keyCode];
         if (action) {
@@ -76,6 +83,20 @@ class InputEngine {
         return false;
     }
 
+    actionUp(action) {
+        if (action) {
+            gInputEngine.actions[action] = false;
+
+            var listeners = gInputEngine.listeners[action];
+            if (listeners) {
+                for (var i = 0; i < listeners.length; i++) {
+                    var listener = listeners[i];
+                    listener();
+                }
+            }
+        }
+    }
+
     /**
      * The bind function takes an ASCII keycode and a string representing
      * the action to take when that key is pressed.
@@ -87,6 +108,11 @@ class InputEngine {
     addListener(action, listener) {
         this.listeners[action] = this.listeners[action] || new Array();
         this.listeners[action].push(listener);
+    }
+
+
+    removeListener(action) {
+        this.listeners[action] = new Array();
     }
 
     removeAllListeners() {

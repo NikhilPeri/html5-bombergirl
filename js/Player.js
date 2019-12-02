@@ -325,7 +325,7 @@ class Player extends Entity {
 
     die() {
         this.alive = false;
-
+        gInputEngine.removeListener(this.controls.bomb);
         if (gGameEngine.countPlayersAlive() == 1 && gGameEngine.playersCount == 2) {
             gGameEngine.gameOver('win');
         } else if (gGameEngine.countPlayersAlive() == 0) {
