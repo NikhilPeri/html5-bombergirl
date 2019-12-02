@@ -375,7 +375,7 @@ class GameEngine {
         // board for observation
         var board = [];
         for (var i = 0; i < gGameEngine.tilesY; i++) {
-            board[i] = Array(gGameEngine.tilesX).fill(9);
+            board[i] = Array(gGameEngine.tilesX).fill(0);
         }
         if (gGameEngine.countPlayersAlive() == 0) {
             return board
@@ -384,42 +384,46 @@ class GameEngine {
         // Players
         for (var i = 0; i < gGameEngine.players.length; i++) {
             var player = gGameEngine.players[i];
-            board[player.position.y][player.position.x] = player.id;
-            player.bombs.map((b) => {board[b.position.y][b.position.x] = 10 + player.id;})
+            if (player.alive) {
+                board[player.position.y][player.position.x] = player.id + 1;
+                player.bombs.map((b) => {board[b.position.y][b.position.x] += 10;})
+            }
         }
 
         // Bots
         for (var i = 0; i < gGameEngine.bots.length; i++) {
             var bot = gGameEngine.bots[i];
-            board[bot.position.y][bot.position.x] = bot.id;
-            bot.bombs.map((b) => {board[b.position.y][b.position.x] = 10 + bot.id;})
+            if (bot.alive) {
+                board[bot.position.y][bot.position.x] = bot.id + 1;
+                bot.bombs.map((b) => {board[b.position.y][b.position.x] += 10;})
+            }
         }
 
         // Tiles
         for (var i = 0; i < gGameEngine.tiles.length; i++) {
             var tile = gGameEngine.tiles[i];
             if ( tile.material == 'wall') {
-                board[tile.position.y][tile.position.x] = 4
-            } else if ( tile.material == 'wood') {
                 board[tile.position.y][tile.position.x] = 5
+            } else if ( tile.material == 'wood') {
+                board[tile.position.y][tile.position.x] = 6
             }
         }
 
         // Bonuses
         for (var i = 0; i < gGameEngine.bonuses.length; i++) {
             var bonus = gGameEngine.bonuses[i];
-            if (!board[bonus.position.y][bonus.position.x]) { //grass
+            if (board[bonus.position.y][bonus.position.x] == 0) { //grass
                 if ( bonus.type == 'speed') {
-                    board[bonus.position.y][bonus.position.x] = 6
-                } else if ( bonus.type == 'bomb') {
                     board[bonus.position.y][bonus.position.x] = 7
-                } else {
+                } else if ( bonus.type == 'bomb') {
                     board[bonus.position.y][bonus.position.x] = 8
+                } else {
+                    board[bonus.position.y][bonus.position.x] = 9
                 }
             }
         }
 
-        return board;
+        return board
     }
 }
 

@@ -14,7 +14,8 @@ class RandomAgent(object):
         return np.random.choice(ACTION_SPACE)
 
 class PolicyAgent(object):
-    def __init__(self, learning_rate=1e-2, model_file='tmp.h5'):
+    def __init__(self, gamma=0.99, learning_rate=5e-5, model_file='tmp.h5'):
+        self.gamma = gamma
         self.learning_rate = learning_rate
         self.model_file = model_file
         # active
@@ -30,22 +31,25 @@ class PolicyAgent(object):
         player = Lambda(lambda i: K.squeeze(K.one_hot(i, num_classes=4), axis=-2), output_shape=(4,))(player_in)
 
         board_in = Input(shape=(13, 17), dtype=np.uint8)
-        board = Lambda(lambda i: K.one_hot(i, num_classes=10), output_shape=(13, 17, 10))(board_in)
+        board = Lambda(lambda i: K.one_hot(i, num_classes=14), output_shape=(13, 17, 14))(board_in)
 
-        conv1 = Conv2D(64, (3, 3), data_format='channels_last')(board)
-        conv1 = Conv2D(64, (3, 3), data_format='channels_last', activation='relu')(conv1)
+
+        conv1 = Conv2D(64, (4, 4), padding='same', data_format='channels_last')(board)
+        conv1 = Conv2D(64, (4, 4), padding='same', data_format='channels_last', activation='relu')(conv1)
         pool1 = MaxPooling2D((2, 2), data_format='channels_last')(conv1)
 
-        conv2 = Conv2D(128, (3, 3), padding='same', data_format='channels_last')(pool1)
+        conv2 = Conv2D(128, (3, 3), padding='same', data_format='channels_last')(conv1)
         conv2 = Conv2D(128, (3, 3), padding='same', data_format='channels_last', activation='relu')(conv2)
         pool2 = MaxPooling2D((2, 2), data_format='channels_last')(conv2)
 
-        flat = Flatten()(pool2)
+        flat = Flatten()(board)
 
         dense1 = Concatenate()([flat, player])
-        dense1 = Dense(64)(dense1)
+        dense1 = Dense(256, activation='relu')(dense1)
+        dense2 = Dense(256, activation='relu')(dense1)
+        dense3 = Dense(64, activation='relu')(dense2)
 
-        output = Dense(len(ACTION_SPACE), activation='softmax')(dense1)
+        output = Dense(len(ACTION_SPACE), activation='softmax')(dense3)
 
         def policy_gradient(y_true, y_pred):
             y_pred = K.clip(y_pred, 1e-8, 1-1e-8)
@@ -82,13 +86,15 @@ class PolicyAgent(object):
         reward_memory = np.array(self.reward_memory)
         self.reward_memory = []
 
-        action_memory = [ACTION_SPACE.index(a) for a in action_memory]
-        action_memory = np.zeros([len(action_memory), len(ACTION_SPACE)])
-        actions[np.arange(len(action_memory)), action_memory] = 1
+        # ghetto one hot encode
+        _action_memory = [ACTION_SPACE.index(a) for a in action_memory]
+        action_memory = np.zeros([len(_action_memory), len(ACTION_SPACE)])
+        action_memory[np.arange(len(_action_memory)), _action_memory] = 1
+        _action_memory = None
 
         # Apply Discounted Future Reward
         R = np.zeros_like(reward_memory)
-        for t in reward_memory.shape[0]:
+        for t in range(reward_memory.shape[0]):
             R_dis = np.zeros(4)
             discount = 1
             for k in range(t, reward_memory.shape[0]):
@@ -98,12 +104,7 @@ class PolicyAgent(object):
         mean = np.mean(R)
         std = np.std(R) if np.std(R) > 0 else 1
         R = (R - mean) / std
-
-        cost = self.policy_model.train_on_batch([
-            state_memory,
-            np.tile([0,1,2,3], R.shape[0]),
-            R.flatten()
-        ], actions.flatten())
+        cost = self.policy_model.train_on_batch([state_memory, np.tile([0,1,2,3], R.shape[0])[:, np.newaxis], R.flatten()[:, np.newaxis]], action_memory)
 
         return cost
 
